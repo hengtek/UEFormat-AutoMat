@@ -1,3 +1,11 @@
+status:
+have not made public due to the frequency of updates to cue4parse and ueformat which make it too bothersome to maintain a fork. might make a pull request when I have time to merge changes
+
+currently working on refactoring many of my local blender scripts into a generalized addon which would include a way to easily specify a directory for textures and auto apply with the below code
+
+apologies to the people who got excited and forked this. please continue using the latest upstream version for now 
+
+
 WIP local, not uploaded yet. Actual integration with blender takes longer than it should because blender api is the worst thing ever made
 the actual code that needs to be added is essentially as follows. The main holdup is deciding where best to put this
 and adding a path storage component to the addon as a whole since it doesnt seem to store import path in a bpy.context variable
