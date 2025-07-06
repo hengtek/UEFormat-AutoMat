@@ -1,52 +1,12 @@
-status:
-have not made public due to the frequency of updates to cue4parse and ueformat which make it too bothersome to maintain a fork. might make a pull request when I have time to merge changes
+WIP Version can be downloaded from releases page or by going to blender branch. Currently it needs to overwrite the default extension and does not differentiate itself in the blender UI
 
-currently working on refactoring many of my local blender scripts into a generalized addon which would include a way to easily specify a directory for textures and auto apply with the below code
+**For texturing to work you need to export materials and models from fmodel as json format! The model must be in the same folder as the uemodel export and materials must be in the appropriate relative folder**
 
-apologies to the people who got excited and forked this. please continue using the latest upstream version for now 
+Yes this sucks because fmodel exports are extremely inconsistent, don't actually list which files were exported, sometimes export things to Game and sometimes to GameName/Content, etc. Even so this addon will save you a ton of time if you just make sure to merge your folders.
 
+I will resolve this somehow before I make a pull request. Possibilities include: adding a few options to set corresponding paths in blender, more expensive filesystem searching, an fmodel update to auto export properties and/or fix export process in general, or most likely a cue4parse update to embed the textures or at minimum embed the texture names in uemodels. 
 
-WIP local, not uploaded yet. Actual integration with blender takes longer than it should because blender api is the worst thing ever made
-the actual code that needs to be added is essentially as follows. The main holdup is deciding where best to put this
-and adding a path storage component to the addon as a whole since it doesnt seem to store import path in a bpy.context variable
-pathing is also very inconsisten across games but I will switch to parsing the mesh and mat files (may require json output for mesh) to find the actual paths
-```
-def apply_texture(obj, texture_path):
-  # Create a new material if the object doesn't have one
-  for material in obj.data.materials:
-      if material.name == "MI_"+basename(texture_path).replace("_D","").replace("T_","").rsplit(".")[0]:
-    
-              
-        # Enable 'Use Nodes'
-        material.use_nodes = True
-        nodes = material.node_tree.nodes
-        
-        # Clear default nodes
-        for node in nodes:
-            nodes.remove(node)
-      
-        # Create nodes
-        bsdf = nodes.new(type='ShaderNodeBsdfPrincipled')
-        texture = nodes.new(type='ShaderNodeTexImage')
-        try:
-            normtexture = nodes.new(type='ShaderNodeTexImage')
-            normtexture.image = bpy.data.images.load(str(texture_path).replace("_D","_N"))
-            normtexture.image.colorspace_settings.name = 'Non-Color'
-        except Exception as e:
-            pass
-        texture.image = bpy.data.images.load(texture_path)
-        texture.image.alpha_mode ='PREMUL'
-        output = nodes.new(type='ShaderNodeOutputMaterial')
-        # Position nodes
-        texture.location = (-300, 0)
-        bsdf.location = (0, 0)
-        output.location = (300, 0)
-      
-        # Link nodes
-        links = material.node_tree.links
-        links.new(texture.outputs['Color'], bsdf.inputs['Base Color'])
-        links.new(bsdf.outputs['BSDF'], output.inputs['Surface'])
-  ```
+Alternatively I could require ueassets to be present but at that point I may as well just ditch uemodel format and make a new addon that uses cue4parse and/or uassetapi. then you could just use repak to extract an entire game. blender imports would probably be longer but idk seems kind of worth it. Might do that 
 
 
 <div align="center">
